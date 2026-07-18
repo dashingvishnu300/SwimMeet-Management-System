@@ -1,3 +1,4 @@
+from django.core.management.base import BaseCommand
 from masters.models import (
     StateMaster,
     DistrictMaster
@@ -434,29 +435,36 @@ for state_id, districts in district_data.items():
         id=state_id
     )
 
-    for district_name in districts:
 
-        DistrictMaster.objects.get_or_create(
+    class Command(BaseCommand):
+        help = "Seed Districts"
 
-            district_name=district_name,
+        def handle(self, *args, **kwargs):
 
-            state=state,
+            for state_id, districts in district_data.items():
 
-            defaults={
-
-                "district_code":
-                    (
-                            f"{state_id}_"
-                            + district_name.upper().replace(
-                        " ",
-                        "_"
+                try:
+                    state = StateMaster.objects.get(id=state_id)
+                except StateMaster.DoesNotExist:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"State ID {state_id} not found."
+                        )
                     )
-                    )[:50]
+                    continue
 
-            }
+                for district_name in districts:
+                    DistrictMaster.objects.get_or_create(
+                        district_name=district_name,
+                        state=state,
+                        defaults={
+                            "district_code": (
+                                                     f"{state_id}_"
+                                                     + district_name.upper().replace(" ", "_")
+                                             )[:50]
+                        }
+                    )
 
-        )
-
-print(
-    "Districts inserted successfully!"
-)
+            self.stdout.write(
+                self.style.SUCCESS("Districts seeded successfully.")
+            )
