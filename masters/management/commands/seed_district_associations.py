@@ -28,15 +28,11 @@ class Command(BaseCommand):
                 association_name=association_name,
 
                 defaults={
-
                     "association_code": association_code,
-
+                    "association_type": Association.DISTRICT,
                     "district": district,
-
                     "state": district.state,
-
-                    "is_active": True
-
+                    "is_active": True,
                 }
 
             )
