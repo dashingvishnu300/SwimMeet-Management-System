@@ -45,44 +45,6 @@ class StateMaster(models.Model):
         verbose_name = "State"
         verbose_name_plural = "States"
 
-    def clean(self):
-
-        if self.association_type == self.NATIONAL:
-
-            if self.state or self.district:
-                raise ValidationError(
-                    "National association cannot have state or district."
-                )
-
-        elif self.association_type == self.STATE:
-
-            if not self.state:
-                raise ValidationError(
-                    "State association must have a state."
-                )
-
-            if self.district:
-                raise ValidationError(
-                    "State association cannot have district."
-                )
-
-        elif self.association_type == self.DISTRICT:
-
-            if not self.state:
-                raise ValidationError(
-                    "District association must have state."
-                )
-
-            if not self.district:
-                raise ValidationError(
-                    "District association must have district."
-                )
-
-    def save(self, *args, **kwargs):
-
-        self.full_clean()
-
-        super().save(*args, **kwargs)
     def __str__(self):
         return self.state_name
 
@@ -278,7 +240,7 @@ class Association(models.Model):
                     "District association must have district."
                 )
 
-        def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
 
             self.full_clean()
 
